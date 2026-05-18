@@ -376,6 +376,13 @@ input[type=color].set-col { width: 40px; height: 38px; padding: 2px; flex: none;
   border: 1px solid var(--brd2); border-radius: 10px;
   padding: 14px 18px; font-size: 14px; cursor: pointer; font-family: inherit;
 }
+.btn-prev {
+  width: 100%; background: var(--s2); color: var(--text2);
+  border: 1px solid var(--brd2); border-radius: 10px;
+  padding: 11px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  letter-spacing: .03em; transition: background .15s;
+}
+.btn-prev:active { background: var(--s3); }
 .btn-clr {
   background: rgba(204,68,85,.1); color: #cc4455;
   border: 1px solid rgba(204,68,85,.25); border-radius: 10px;
@@ -646,6 +653,9 @@ input[type=color].set-col { width: 40px; height: 38px; padding: 2px; flex: none;
     <div class="modal-sec"><div class="modal-sec-lbl">外国人作業員</div><div class="opt-grid" id="m-for"></div></div>
     <div class="modal-sec"><div class="modal-sec-lbl">車両</div><div class="opt-grid wide" id="m-veh"></div></div>
     <div class="modal-sec"><div class="modal-sec-lbl">建設機械</div><div class="opt-grid wide" id="m-mac"></div></div>
+    <div style="padding:12px 16px 0;">
+      <button class="btn-prev" onclick="copyPrevDay()">📋 前日コピー</button>
+    </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-clr" onclick="clearCell()">クリア</button>
@@ -1028,6 +1038,20 @@ function saveModal(){
   save(DB);saveAssign(editKey,data);renderAll();closeModal();
 }
 function clearCell(){if(!editKey)return;delete DB.assign[editKey];save(DB);saveAssign(editKey,null);renderAll();closeModal();}
+function copyPrevDay(){
+  if(!editKey||!editDate)return;
+  const siteId=editKey.split('_')[0];
+  const prev=new Date(editDate);prev.setDate(prev.getDate()-1);
+  const prevKey=`${siteId}_${ds(prev)}`;
+  const a=DB.assign[prevKey];
+  if(!a||(!( a.workers||[]).length&&!(a.vehicles||[]).length&&!(a.machines||[]).length)){
+    alert('前日のデータがありません');return;
+  }
+  mState.workers=[...(a.workers||[])];
+  mState.vehicles=[...(a.vehicles||[])];
+  mState.machines=[...(a.machines||[])];
+  buildOpts();
+}
 
 /* settings actions */
 let uid=Date.now();
